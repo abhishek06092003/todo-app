@@ -1,27 +1,44 @@
 import { useState } from "react";
 
 function App() {
-  // Store input value
+  // Input state
   const [task, setTask] = useState("");
 
-  // Store all tasks
+  // Task array state
   const [tasks, setTasks] = useState([]);
 
-  // Add new task
+  // Add task
   const addTask = () => {
-    // Prevent empty task
     if (task.trim() === "") return;
 
     const newTask = {
       id: Date.now(),
       text: task,
+      completed: false,
     };
 
-    // Add task to array
     setTasks([...tasks, newTask]);
-
-    // Clear input
     setTask("");
+  };
+
+  // Delete task
+  const deleteTask = (id) => {
+    const filteredTasks = tasks.filter(
+      (item) => item.id !== id
+    );
+
+    setTasks(filteredTasks);
+  };
+
+  // Toggle complete
+  const toggleComplete = (id) => {
+    const updatedTasks = tasks.map((item) =>
+      item.id === id
+        ? { ...item, completed: !item.completed }
+        : item
+    );
+
+    setTasks(updatedTasks);
   };
 
   return (
@@ -44,7 +61,7 @@ function App() {
 
           <button
             onClick={addTask}
-            className="bg-blue-500 text-white px-4 rounded-lg"
+            className="bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600"
           >
             Add
           </button>
@@ -52,14 +69,36 @@ function App() {
 
         {/* Task List */}
         <div className="mt-4">
+
           {tasks.map((item) => (
             <div
               key={item.id}
-              className="bg-gray-100 p-2 rounded-lg mb-2"
+              className="flex justify-between items-center bg-gray-100 p-3 rounded-lg mb-2"
             >
-              {item.text}
+
+              {/* Task Text */}
+              <p
+                onClick={() => toggleComplete(item.id)}
+                className={`cursor-pointer ${
+                  item.completed
+                    ? "line-through text-gray-400"
+                    : ""
+                }`}
+              >
+                {item.text}
+              </p>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => deleteTask(item.id)}
+                className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
+
             </div>
           ))}
+
         </div>
 
       </div>
