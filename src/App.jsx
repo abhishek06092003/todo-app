@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 
+import Header from "./components/Header";
+import TodoInput from "./components/TodoInput";
+import FilterButtons from "./components/FilterButtons";
+import TodoList from "./components/TodoList";
+
 function App() {
 
   const [task, setTask] = useState("");
@@ -7,7 +12,6 @@ function App() {
   const [filter, setFilter] = useState("all");
   const [darkMode, setDarkMode] = useState(false);
 
-  // Load tasks
   useEffect(() => {
 
     const savedTasks = JSON.parse(
@@ -20,7 +24,6 @@ function App() {
 
   }, []);
 
-  // Save tasks
   useEffect(() => {
 
     localStorage.setItem(
@@ -30,7 +33,6 @@ function App() {
 
   }, [tasks]);
 
-  // Add task
   const addTask = () => {
 
     if (task.trim() === "") {
@@ -48,7 +50,6 @@ function App() {
     setTask("");
   };
 
-  // Delete task
   const deleteTask = (id) => {
 
     const updatedTasks = tasks.filter(
@@ -58,7 +59,6 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  // Complete task
   const toggleComplete = (id) => {
 
     const updatedTasks = tasks.map((item) => {
@@ -78,7 +78,6 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  // Clear completed
   const clearCompleted = () => {
 
     const pendingTasks = tasks.filter(
@@ -88,7 +87,6 @@ function App() {
     setTasks(pendingTasks);
   };
 
-  // Filter tasks
   const filteredTasks = tasks.filter((item) => {
 
     if (filter === "completed") {
@@ -102,7 +100,6 @@ function App() {
     return true;
   });
 
-  // Counts
   const completedCount = tasks.filter(
     (item) => item.completed
   ).length;
@@ -129,94 +126,22 @@ function App() {
         }`}
       >
 
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4">
+        <Header
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
 
-          <h1 className="text-3xl font-bold">
-            Todo App
-          </h1>
+        <TodoInput
+          task={task}
+          setTask={setTask}
+          addTask={addTask}
+          darkMode={darkMode}
+        />
 
-          <button
-            onClick={() =>
-              setDarkMode(!darkMode)
-            }
-            className={`px-3 py-1 rounded-lg ${
-              darkMode
-                ? "bg-white text-black"
-                : "bg-black text-white"
-            }`}
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
+        <FilterButtons
+          setFilter={setFilter}
+        />
 
-        </div>
-
-        {/* Input */}
-        <div className="flex gap-2">
-
-          <input
-            type="text"
-            placeholder="Enter task"
-            value={task}
-            onChange={(e) =>
-              setTask(e.target.value)
-            }
-
-            onKeyDown={(e) => {
-
-              if (e.key === "Enter") {
-                addTask();
-              }
-
-            }}
-
-            className={`border p-2 rounded-lg flex-1 ${
-              darkMode
-                ? "bg-gray-700 text-white border-gray-600"
-                : "bg-white text-black"
-            }`}
-          />
-
-          <button
-            onClick={addTask}
-            className="bg-blue-500 text-white px-4 rounded-lg"
-          >
-            Add
-          </button>
-
-        </div>
-
-        {/* Filter Buttons */}
-        <div className="flex justify-center gap-2 mt-4">
-
-          <button
-            onClick={() => setFilter("all")}
-            className="bg-gray-300 text-black px-3 py-1 rounded-lg"
-          >
-            All
-          </button>
-
-          <button
-            onClick={() =>
-              setFilter("completed")
-            }
-            className="bg-green-300 text-black px-3 py-1 rounded-lg"
-          >
-            Completed
-          </button>
-
-          <button
-            onClick={() =>
-              setFilter("pending")
-            }
-            className="bg-yellow-300 text-black px-3 py-1 rounded-lg"
-          >
-            Pending
-          </button>
-
-        </div>
-
-        {/* Counter */}
         <div className="flex justify-between mt-4">
 
           <p>
@@ -229,59 +154,13 @@ function App() {
 
         </div>
 
-        {/* Task List */}
-        <div className="mt-4">
+        <TodoList
+          filteredTasks={filteredTasks}
+          darkMode={darkMode}
+          toggleComplete={toggleComplete}
+          deleteTask={deleteTask}
+        />
 
-          {filteredTasks.length === 0 ? (
-
-            <p className="text-center text-gray-400">
-              No tasks found
-            </p>
-
-          ) : (
-
-            filteredTasks.map((item) => (
-
-              <div
-                key={item.id}
-                className={`flex justify-between items-center p-3 rounded-lg mb-2 ${
-                  darkMode
-                    ? "bg-gray-700"
-                    : "bg-gray-100"
-                }`}
-              >
-
-                <p
-                  onClick={() =>
-                    toggleComplete(item.id)
-                  }
-                  className={`cursor-pointer ${
-                    item.completed
-                      ? "line-through text-gray-400"
-                      : ""
-                  }`}
-                >
-                  {item.text}
-                </p>
-
-                <button
-                  onClick={() =>
-                    deleteTask(item.id)
-                  }
-                  className="bg-red-500 text-white px-3 py-1 rounded-lg"
-                >
-                  Delete
-                </button>
-
-              </div>
-
-            ))
-
-          )}
-
-        </div>
-
-        {/* Clear Completed */}
         {completedCount > 0 && (
 
           <button
